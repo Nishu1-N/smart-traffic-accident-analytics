@@ -1,0 +1,14 @@
+# Environment / secrets - never commit these
+.env
+venv/
+__pycache__/
+*.pyc
+
+# OS/editor junk
+.DS_Store
+.vscode/
+
+# NOTE: data/*.csv and models/*.pkl are intentionally NOT ignored.
+# The deployed Streamlit app reads directly from these files
+# (no live MySQL connection needed at runtime), so they must be
+# committed to the repository for the dashboard to work online.
