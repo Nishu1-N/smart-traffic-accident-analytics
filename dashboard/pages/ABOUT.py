@@ -5,7 +5,7 @@ Useful reference during your viva.
 
 import streamlit as st
 
-st.set_page_config(page_title="About", page_icon="ℹ️", layout="wide")
+st.set_page_config(page_title="Hotspot Map", page_icon="dashboard/assets/logo.png", layout="wide")
 
 st.markdown("""
 <img src="x" style="display:none" onerror="
@@ -31,7 +31,7 @@ st.title("ℹ️ About This Project")
 
 st.markdown("""
 
-## Smart Traffic Accident Analytics and Risk Prediction System
+## Road-Safe Ranchi - Smart Traffic Accident Analytics and Safety recommendation System 
 
 ### Project Summary
 This project demonstrates a complete data analytics and machine learning pipeline
@@ -41,8 +41,7 @@ applied to road safety, focused on **44 major locations in Ranchi, Jharkhand**.
 1. **Location Data (Real):** 44 major roads/intersections in Ranchi were geocoded
    using OpenStreetMap's Nominatim API to obtain real latitude/longitude coordinates.
 2. **Accident Data (Synthetic):** Since detailed accident-level datasets are not publicly
-   available for Ranchi, a Monte Carlo simulation was used to generate ~8,000 statistically
-   realistic accident records, using probability distributions informed by general road
+   available for Ranchi, a Monte Carlo simulation was used to generate ~8,000 accident records, using probability distributions informed by general road
    safety patterns (e.g., higher accident rates during rush hours, elevated severity risk
    in adverse weather, heavier vehicles associated with more severe outcomes).
 3. **Database:** All data is stored and queried using MySQL.
@@ -80,5 +79,4 @@ applied to road safety, focused on **44 major locations in Ranchi, Jharkhand**.
 - Integrate real accident records if/when made publicly available
 - Add live traffic data via a traffic API
 - Extend the model to include weather forecast integration for proactive risk alerts
-- Deploy the dashboard publicly (e.g. Streamlit Community Cloud)
 """)

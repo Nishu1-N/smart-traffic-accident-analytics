@@ -1,7 +1,9 @@
 """
-Risk Prediction page — lets the user pick accident conditions and
-get a live severity prediction from the trained ML model
-(models/model.pkl, trained in Phase 8).
+Risk Prediction page - lets the user pick accident conditions, get a
+live severity prediction from the trained ML model, AND now shows
+specific, actionable safety precautions based on those conditions.
+This is what turns the tool from "just a prediction" into practical
+guidance a user could actually act on.
 """
 
 import os
@@ -9,18 +11,10 @@ import sys
 import streamlit as st
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-st.set_page_config(page_title="Risk Prediction", page_icon="🔮", layout="wide")
+
+st.set_page_config(page_title="Risk Prediction", page_icon="dashboard/assets/logo.png", layout="wide")
 
 st.markdown("""
-<img src="x" style="display:none" onerror="
-    const doc = (window.parent.document || document);
-    if (!doc.getElementById(&quot;global-sidebar-style&quot;)) {
-        const style = doc.createElement(&quot;style&quot;);
-        style.id = &quot;global-sidebar-style&quot;;
-        style.textContent = &quot;[data-testid=stSidebarNav] span { text-transform: uppercase !important; letter-spacing: 0.5px !important; }&quot;;
-        doc.head.appendChild(style);
-    }
-">
 <style>
 [data-testid="stSidebarNav"] span {
     text-transform: uppercase;
@@ -29,17 +23,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-
 st.title("🔮 Accident Risk Prediction")
 st.markdown("""
 Select conditions below to predict the likely severity of an accident under those
-circumstances, using the machine learning model trained.
+circumstances, using the machine learning model trained  — along with
+specific safety precautions for those conditions.
 """)
 
 try:
     from models.predict import (
-        SeverityPredictor, WEATHER_OPTIONS, ROAD_TYPE_OPTIONS,
+        SeverityPredictor, generate_precautions, WEATHER_OPTIONS, ROAD_TYPE_OPTIONS,
         TRAFFIC_DENSITY_OPTIONS, VEHICLE_TYPE_OPTIONS, DAY_OPTIONS, TIME_OF_DAY_OPTIONS
     )
 
@@ -60,7 +53,6 @@ try:
         day_of_week = st.selectbox("Day of Week", DAY_OPTIONS)
 
     with col3:
-        # Build 12-hour AM/PM labels for all 24 hours (e.g. "12 AM", "1 AM", ..., "11 PM")
         hour_labels = []
         for h in range(24):
             period = "AM" if h < 12 else "PM"
@@ -68,9 +60,8 @@ try:
             if display_hour == 0:
                 display_hour = 12
             hour_labels.append(f"{display_hour} {period}")
-
         selected_label = st.select_slider("Hour of Day", options=hour_labels, value="6 PM")
-        hour = hour_labels.index(selected_label)  # convert back to 0-23 for the model
+        hour = hour_labels.index(selected_label)
         time_of_day = st.selectbox("Time of Day", TIME_OF_DAY_OPTIONS)
 
     st.markdown("---")
@@ -97,10 +88,22 @@ try:
             col3.metric("Fatal", f"{probs.get('Fatal', 0) * 100:.1f}%")
             st.bar_chart(probs)
 
+        # --- NEW: Actionable safety precautions ---
+        st.markdown("---")
+        st.subheader("🛡️ Recommended Safety Precautions")
+        precautions = generate_precautions(
+            weather=weather, road_type=road_type, traffic_density=traffic_density,
+            vehicle_type=vehicle_type, hour=hour, day_of_week=day_of_week,
+            predicted_severity=label,
+        )
+        for tip in precautions:
+            st.markdown(f"- {tip}")
+
         st.info(
-            "Note: This prediction is based on a model trained on synthetic (simulated) "
-            "accident data, intended to demonstrate the full analytics pipeline. It is not "
-            "based on real historical accident records for Ranchi."
+            "Note: This prediction and these precautions are based on a model trained on "
+            "synthetic (simulated) accident data, intended to demonstrate the full analytics "
+            "pipeline. They are general road-safety guidance, not based on real historical "
+            "records for Ranchi."
         )
 
 except FileNotFoundError:

@@ -7,18 +7,10 @@ import os
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+
 st.set_page_config(page_title="Analytics", page_icon="📊", layout="wide")
 
 st.markdown("""
-<img src="x" style="display:none" onerror="
-    const doc = (window.parent.document || document);
-    if (!doc.getElementById(&quot;global-sidebar-style&quot;)) {
-        const style = doc.createElement(&quot;style&quot;);
-        style.id = &quot;global-sidebar-style&quot;;
-        style.textContent = &quot;[data-testid=stSidebarNav] span { text-transform: uppercase !important; letter-spacing: 0.5px !important; }&quot;;
-        doc.head.appendChild(style);
-    }
-">
 <style>
 [data-testid="stSidebarNav"] span {
     text-transform: uppercase;
@@ -26,8 +18,6 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-
-
 
 DATA_PATH = os.path.join("data", "eda_ready.csv")
 
@@ -75,6 +65,8 @@ try:
         fig = px.bar(x=hour_labels, y=hourly.values, labels={"x": "Hour", "y": "Accidents"})
         fig.update_xaxes(categoryorder="array", categoryarray=hour_labels)
         st.plotly_chart(fig, use_container_width=True)
+        st.markdown("**📝 Description:**")
+        st.caption("Shows accident frequency across the 24-hour day. Peaks typically appear during morning and evening rush hours.")
 
     with col2:
         st.subheader("Severity Distribution")
@@ -85,6 +77,8 @@ try:
             color_discrete_map={"Minor": "#4CAF50", "Serious": "#FF9800", "Fatal": "#F44336"},
         )
         st.plotly_chart(fig, use_container_width=True)
+        st.markdown("**📝 Description:**")
+        st.caption("Proportion of accidents by severity level — Minor, Serious, or Fatal — across the filtered dataset.")
 
     # --- Row 2: Weather + Vehicle type ---
     col1, col2 = st.columns(2)
@@ -93,12 +87,16 @@ try:
         weather_counts = filtered_df["weather_condition"].value_counts()
         fig = px.bar(x=weather_counts.index, y=weather_counts.values, labels={"x": "Weather", "y": "Accidents"})
         st.plotly_chart(fig, use_container_width=True)
+        st.markdown("**📝 Description:**")
+        st.caption("Accident counts under each weather condition. Higher counts under Clear weather mostly reflect that clear days are far more common overall.")
 
     with col2:
         st.subheader("Accidents by Vehicle Type")
         vehicle_counts = filtered_df["vehicle_type"].value_counts()
         fig = px.bar(x=vehicle_counts.index, y=vehicle_counts.values, labels={"x": "Vehicle", "y": "Accidents"})
         st.plotly_chart(fig, use_container_width=True)
+        st.markdown("**📝 Description:**")
+        st.caption("Number of accidents involving each vehicle type. Two-wheelers appear most often, consistent with their high share of Indian road traffic.")
 
     # --- Row 3: Monthly trend ---
     st.subheader("Monthly Accident Trend")
@@ -106,6 +104,8 @@ try:
     monthly.index = monthly.index.astype(str)
     fig = px.line(x=monthly.index, y=monthly.values, labels={"x": "Month", "y": "Accidents"})
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("**📝 Description:**")
+    st.caption("Accident counts over time (2021-2025), showing month-by-month trends across the full dataset period.")
 
     # --- Row 4: Severity by road type (stacked) ---
     st.subheader("Severity Breakdown by Road Type")
@@ -118,6 +118,8 @@ try:
         barmode="stack",
     )
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("**📝 Description:**")
+    st.caption("Percentage breakdown of severity within each road type. Highways tend to show a higher share of Fatal accidents due to higher speeds.")
 
 except FileNotFoundError:
     st.error(f"Could not find {DATA_PATH}. Run Phases 3-6 first.")
